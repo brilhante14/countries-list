@@ -8,6 +8,11 @@ body {
   font-family: "Roboto";
 }
 
+a {
+  color: #FFF;
+  text-decoration: none;
+}
+
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
