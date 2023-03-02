@@ -1,4 +1,4 @@
-import { Card, CardMedia, Typography } from "@mui/material";
+import { Box, Card, CardMedia, CircularProgress, Typography } from "@mui/material";
 import CardActionArea from "@mui/material/CardActionArea";
 import CardContent from "@mui/material/CardContent";
 import Grid from "@mui/material/Grid";
@@ -6,7 +6,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { api } from "../../api/axios";
 
-interface ICountryInfo {
+export interface ICountryInfo {
    capital: string[];
    name: {
       common: string;
@@ -18,6 +18,12 @@ interface ICountryInfo {
          };
       };
    };
+   currencies: {
+      [abbr: string]: {
+         name: string;
+         symbol: string;
+      }
+   }
    region: string;
    subregion: string;
    languages: {
@@ -40,7 +46,8 @@ export function CountriesGrid() {
    useEffect(() => {
       (async () => {
          const { data } = await api.get("/all");
-         setCountriesList(data)
+
+         setCountriesList(data);
       })()
    }, []);
 
@@ -50,9 +57,9 @@ export function CountriesGrid() {
 
    if (!countriesList.length) {
       return (
-         <h1>
-            Loading
-         </h1>
+         <Box height="100vh" display="flex" justifyContent="center" alignItems="center" >
+            <CircularProgress color="info" />
+         </Box >
       );
    }
 
