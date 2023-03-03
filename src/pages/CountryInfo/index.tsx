@@ -1,9 +1,9 @@
-import { Box, Breadcrumbs, Container, Typography, CircularProgress, Link, Card, CardHeader, CardMedia, Chip } from "@mui/material";
+import HomeIcon from '@mui/icons-material/Home';
+import { Box, Breadcrumbs, Card, CardHeader, CardMedia, Chip, Container, Link, Typography } from "@mui/material";
 import { useEffect, useState } from "react";
 import { Link as RouterLink, useParams } from "react-router-dom";
 import { api } from "../../api/axios";
 import { ICountryInfo } from "../../components/CountriesGrid";
-import HomeIcon from '@mui/icons-material/Home';
 import { Loading } from "../../components/Loading";
 
 export function CountryInfo() {

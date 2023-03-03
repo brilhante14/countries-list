@@ -1,8 +1,8 @@
-import { Alert, Box, Card, CardMedia, CircularProgress, IconButton, Link, Typography } from "@mui/material";
+import { Alert, Box, Card, CardMedia, IconButton, Link, Typography } from "@mui/material";
 import CardContent from "@mui/material/CardContent";
 import Grid from "@mui/material/Grid";
 import { AxiosError } from "axios";
-import { memo, useEffect, useState } from "react";
+import { memo, useCallback, useEffect, useRef, useState } from "react";
 import { Link as RouterLink } from "react-router-dom";
 import { api } from "../../api/axios";
 
@@ -73,10 +73,12 @@ function CountriesGrid({ countrySearch }: ICountriesGridProps) {
                }
             });
 
+            setCountriesRendered(result.slice(0, 16));
             setCountriesList(result);
          } catch (error) {
             if (error instanceof AxiosError && error.response?.status === 404) {
                setCountriesList([]);
+               setCountriesRendered([]);
             }
          } finally {
             setIsLoading(false);
@@ -84,6 +86,26 @@ function CountriesGrid({ countrySearch }: ICountriesGridProps) {
       })()
 
    }, [countrySearch]);
+
+   const hasMore = countriesList.length > countriesRendered.length;
+
+   const observer = useRef<IntersectionObserver>();
+
+   const lastCountryElementRef = useCallback((node: HTMLDivElement) => {
+      if (isLoading) return;
+
+      if (observer.current) observer.current.disconnect();
+
+      observer.current = new IntersectionObserver((entries) => {
+         if (entries[0].isIntersecting && hasMore) {
+            setCountriesRendered(prevState =>
+               [...countriesList.slice(0, prevState.length + 16)]
+            )
+         }
+      });
+
+      if (node) observer.current.observe(node);
+   }, [isLoading, hasMore]);
 
    function handleClickFavorite(countryCode: string, isFavorite: boolean) {
       const storage = localStorage.getItem("favorite");
@@ -98,6 +120,9 @@ function CountriesGrid({ countrySearch }: ICountriesGridProps) {
       localStorage.setItem("favorite", JSON.stringify(favorited));
 
       setCountriesList(prevState => prevState.map(c => {
+         return c.cca3 === countryCode ? { ...c, favorited: !isFavorite } : c
+      }));
+      setCountriesRendered(prevState => prevState.map(c => {
          return c.cca3 === countryCode ? { ...c, favorited: !isFavorite } : c
       }));
    }
@@ -116,46 +141,51 @@ function CountriesGrid({ countrySearch }: ICountriesGridProps) {
 
    return (
       <Grid container spacing={2} paddingBottom={2}>
-         {countriesList.map((country, index) => (
-            <Grid
-               key={index}
-               item
-               xs={3}
-            >
-               <Card variant="elevation" >
-                  <CardMedia
-                     sx={{ height: 200 }}
-                     image={country.flags.svg}
-                     title={country.flags.alt}
+         {countriesRendered.map((country, index) => {
+            const isLastElement = countriesRendered.length === index + 1;
+            return (
+               <Grid
+                  key={index}
+                  item
+                  xs={3}
+                  ref={isLastElement ? lastCountryElementRef : null}
+               >
+                  <Card variant="elevation" >
+                     <CardMedia
+                        sx={{ height: 200 }}
+                        image={country.flags.svg}
+                        title={country.flags.alt}
 
-                  />
-                  <CardContent>
-                     <Box display="flex" justifyContent="space-between">
-                        <Link
-                           component={RouterLink}
-                           gutterBottom
-                           variant="h6"
-                           to={`/country/${country.cca3}`}
-                           underline="hover"
-                           color="inherit"
-                        >
-                           {country.name.common}
-                           <Typography variant="body2" color="text.secondary">
-                              {country.capital ?? "-"}
-                           </Typography>
-                        </Link>
-                        <IconButton onClick={() => handleClickFavorite(country.cca3, country.favorited)}>
-                           {country.favorited ?
-                              <FavoriteIcon color="error" />
-                              :
-                              <FavoriteBorderRoundedIcon />
-                           }
-                        </IconButton>
-                     </Box>
-                  </CardContent>
-               </Card>
-            </Grid>
-         ))}
+                     />
+                     <CardContent>
+                        <Box display="flex" justifyContent="space-between">
+                           <Link
+                              component={RouterLink}
+                              gutterBottom
+                              variant="h6"
+                              to={`/country/${country.cca3}`}
+                              underline="hover"
+                              color="inherit"
+                           >
+                              {country.name.common}
+                              <Typography variant="body2" color="text.secondary">
+                                 {country.capital ?? "-"}
+                              </Typography>
+                           </Link>
+                           <IconButton onClick={() => handleClickFavorite(country.cca3, country.favorited)}>
+                              {country.favorited ?
+                                 <FavoriteIcon color="error" />
+                                 :
+                                 <FavoriteBorderRoundedIcon />
+                              }
+                           </IconButton>
+                        </Box>
+                     </CardContent>
+                  </Card>
+               </Grid>
+            )
+         }
+         )}
       </Grid>
    );
 }

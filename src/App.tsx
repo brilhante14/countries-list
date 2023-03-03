@@ -5,7 +5,7 @@ import './App.css';
 
 function App() {
   return (
-    <Box sx={{ backgroundColor: "#121214", minHeight: "100vh" }}>
+    <Box sx={{ backgroundColor: "#837d7d", minHeight: "100vh" }}>
       <Box sx={{
         height: 60,
         display: 'flex',
