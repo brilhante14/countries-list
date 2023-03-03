@@ -1,8 +1,9 @@
-import { Box, Card, CardMedia, CircularProgress, Typography } from "@mui/material";
+import { Alert, Box, Card, CardMedia, CircularProgress, Typography } from "@mui/material";
 import CardActionArea from "@mui/material/CardActionArea";
 import CardContent from "@mui/material/CardContent";
 import Grid from "@mui/material/Grid";
-import { useEffect, useState } from "react";
+import { AxiosError } from "axios";
+import { memo, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { api } from "../../api/axios";
 
@@ -38,27 +39,53 @@ export interface ICountryInfo {
    };
 }
 
-export function CountriesGrid() {
+interface ICountriesGridProps {
+   countrySearch: string;
+}
+
+function CountriesGrid({ countrySearch }: ICountriesGridProps) {
    const navigate = useNavigate();
 
    const [countriesList, setCountriesList] = useState<ICountryInfo[]>([]);
+   const [isLoading, setIsLoading] = useState(true);
 
    useEffect(() => {
       (async () => {
-         const { data } = await api.get("/all");
+         try {
+            setIsLoading(true);
 
-         setCountriesList(data);
+            const searchUrl = countrySearch ? `/name/${countrySearch}` : "/all";
+
+            const { data } = await api.get(searchUrl);
+
+            setCountriesList(data);
+         } catch (error) {
+            if (error instanceof AxiosError && error.response?.status === 404) {
+               setCountriesList([]);
+            }
+         } finally {
+            setIsLoading(false);
+         }
       })()
-   }, []);
+
+   }, [countrySearch]);
 
    async function handleCardClick(countryName: string) {
       navigate(`/country/${countryName}`);
    }
 
-   if (!countriesList.length) {
+   if (isLoading) {
       return (
          <Box height="100vh" display="flex" justifyContent="center" alignItems="center" >
             <CircularProgress color="info" />
+         </Box >
+      );
+   }
+
+   if (!countriesList.length) {
+      return (
+         <Box height="100vh" display="flex" justifyContent="center" alignItems="center" >
+            <Alert severity="error">Oops! Nenhum país foi encontrado para essa busca.</Alert>
          </Box >
       );
    }
@@ -95,3 +122,5 @@ export function CountriesGrid() {
       </Grid>
    );
 }
+
+export default memo(CountriesGrid);
