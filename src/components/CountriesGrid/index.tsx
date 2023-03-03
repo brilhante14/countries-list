@@ -64,7 +64,7 @@ export function CountriesGrid() {
    }
 
    return (
-      <Grid container spacing={2}>
+      <Grid container spacing={2} paddingBottom={2}>
          {countriesList.map((country, index) => (
             <Grid
                key={index}
