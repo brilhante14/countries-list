@@ -103,7 +103,7 @@ function CountriesGrid({ countrySearch, filteringFavorites }: ICountriesGridProp
    }
 
    return (
-      <Grid container spacing={2} paddingBottom={2}>
+      <Grid container spacing={{ xs: 2, md: 3, sm: 1 }} columns={{ xs: 4, sm: 8, md: 12 }} paddingBottom={2}>
          {favoritedCountries.slice(0, renderLimit).map((country, index) => {
             const isLastElement = favoritedCountries.slice(0, renderLimit).length === index + 1;
 

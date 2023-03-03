@@ -1,5 +1,5 @@
 import SearchIcon from '@mui/icons-material/Search';
-import { Button, Container, FormControlLabel, IconButton, InputAdornment, Switch, TextField } from "@mui/material";
+import { Container, FormControlLabel, IconButton, InputAdornment, Switch, TextField } from "@mui/material";
 import { useState } from "react";
 import CountriesGrid from "../../components/CountriesGrid";
 
