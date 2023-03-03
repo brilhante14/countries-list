@@ -25,7 +25,8 @@ function CountriesGrid({ countrySearch, filteringFavorites }: ICountriesGridProp
    const favoritedCountries = countriesList.filter(c => filteringFavorites ? c.favorited : c);
 
    useEffect(() => {
-      (async () => {
+
+      const fetchData = setTimeout(async () => {
          try {
             setIsLoading(true);
 
@@ -51,8 +52,9 @@ function CountriesGrid({ countrySearch, filteringFavorites }: ICountriesGridProp
          } finally {
             setIsLoading(false);
          }
-      })()
+      }, 500);
 
+      return () => clearTimeout(fetchData)
    }, [countrySearch]);
 
    const hasMore = countriesList.length > renderLimit;

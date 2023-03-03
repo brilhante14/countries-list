@@ -1,16 +1,11 @@
 import SearchIcon from '@mui/icons-material/Search';
-import { Container, FormControlLabel, IconButton, InputAdornment, Switch, TextField } from "@mui/material";
+import { Container, FormControlLabel, InputAdornment, Switch, TextField } from "@mui/material";
 import { useState } from "react";
 import CountriesGrid from "../../components/CountriesGrid";
 
 export function Home() {
    const [textValue, setTextValue] = useState("");
-   const [search, setSearch] = useState("");
    const [filteringFavorites, setFilteringFavorites] = useState(false);
-
-   function handleSearch() {
-      setSearch(textValue);
-   }
 
    function handleFilterForFavorite() {
       setFilteringFavorites(prevState => !prevState);
@@ -29,9 +24,7 @@ export function Home() {
             InputProps={{
                endAdornment: (
                   <InputAdornment position="end">
-                     <IconButton onClick={handleSearch}>
-                        <SearchIcon />
-                     </IconButton>
+                     <SearchIcon />
                   </InputAdornment>
                ),
             }}
@@ -53,7 +46,7 @@ export function Home() {
             }}
          />
 
-         <CountriesGrid countrySearch={search} filteringFavorites={filteringFavorites} />
+         <CountriesGrid countrySearch={textValue} filteringFavorites={filteringFavorites} />
       </Container>
    );
 }
