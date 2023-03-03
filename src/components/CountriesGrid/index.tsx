@@ -8,51 +8,21 @@ import { api } from "../../api/axios";
 
 import FavoriteIcon from '@mui/icons-material/Favorite';
 import FavoriteBorderRoundedIcon from '@mui/icons-material/FavoriteBorderRounded';
+import { ICountryInfo } from "../../interfaces/country";
 import { Loading } from "../Loading";
-
-export interface ICountryInfo {
-   capital: string[];
-   name: {
-      common: string;
-      official: string;
-      nativeName: {
-         [abbr: string]: {
-            official: string;
-            common: string;
-         };
-      };
-   };
-   cca3: string;
-   currencies: {
-      [abbr: string]: {
-         name: string;
-         symbol: string;
-      }
-   }
-   region: string;
-   subregion: string;
-   languages: {
-      [abbr: string]: string;
-   };
-   population: number;
-   continents: string[];
-   flags: {
-      png: string;
-      svg: string;
-      alt: string;
-   };
-   favorited: boolean;
-}
 
 interface ICountriesGridProps {
    countrySearch: string;
+   filteringFavorites: boolean;
 }
 
-function CountriesGrid({ countrySearch }: ICountriesGridProps) {
+function CountriesGrid({ countrySearch, filteringFavorites }: ICountriesGridProps) {
    const [isLoading, setIsLoading] = useState(true);
 
    const [countriesList, setCountriesList] = useState<ICountryInfo[]>([]);
-   const [countriesRendered, setCountriesRendered] = useState<ICountryInfo[]>([]);
+   const [renderLimit, setRenderLimit] = useState(16);
+
+   const favoritedCountries = countriesList.filter(c => filteringFavorites ? c.favorited : c);
 
    useEffect(() => {
       (async () => {
@@ -73,12 +43,10 @@ function CountriesGrid({ countrySearch }: ICountriesGridProps) {
                }
             });
 
-            setCountriesRendered(result.slice(0, 16));
             setCountriesList(result);
          } catch (error) {
             if (error instanceof AxiosError && error.response?.status === 404) {
                setCountriesList([]);
-               setCountriesRendered([]);
             }
          } finally {
             setIsLoading(false);
@@ -87,7 +55,7 @@ function CountriesGrid({ countrySearch }: ICountriesGridProps) {
 
    }, [countrySearch]);
 
-   const hasMore = countriesList.length > countriesRendered.length;
+   const hasMore = countriesList.length > renderLimit;
 
    const observer = useRef<IntersectionObserver>();
 
@@ -98,9 +66,7 @@ function CountriesGrid({ countrySearch }: ICountriesGridProps) {
 
       observer.current = new IntersectionObserver((entries) => {
          if (entries[0].isIntersecting && hasMore) {
-            setCountriesRendered(prevState =>
-               [...countriesList.slice(0, prevState.length + 16)]
-            )
+            setRenderLimit(prevState => prevState + 16);
          }
       });
 
@@ -122,9 +88,6 @@ function CountriesGrid({ countrySearch }: ICountriesGridProps) {
       setCountriesList(prevState => prevState.map(c => {
          return c.cca3 === countryCode ? { ...c, favorited: !isFavorite } : c
       }));
-      setCountriesRendered(prevState => prevState.map(c => {
-         return c.cca3 === countryCode ? { ...c, favorited: !isFavorite } : c
-      }));
    }
 
    if (isLoading) {
@@ -134,15 +97,16 @@ function CountriesGrid({ countrySearch }: ICountriesGridProps) {
    if (!countriesList.length) {
       return (
          <Box height="100vh" display="flex" justifyContent="center" alignItems="center" >
-            <Alert severity="error">Oops! Nenhum país foi encontrado para essa busca.</Alert>
+            <Alert severity="error">Oops! No country was found for this search on our database.</Alert>
          </Box >
       );
    }
 
    return (
       <Grid container spacing={2} paddingBottom={2}>
-         {countriesRendered.map((country, index) => {
-            const isLastElement = countriesRendered.length === index + 1;
+         {favoritedCountries.slice(0, renderLimit).map((country, index) => {
+            const isLastElement = favoritedCountries.slice(0, renderLimit).length === index + 1;
+
             return (
                <Grid
                   key={index}
