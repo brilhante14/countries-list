@@ -10,7 +10,6 @@ import FavoriteIcon from '@mui/icons-material/Favorite';
 import FavoriteBorderRoundedIcon from '@mui/icons-material/FavoriteBorderRounded';
 import { ICountryInfo } from "../../interfaces/country";
 import { Loading } from "../Loading";
-import Button from "@mui/material/Button/Button";
 
 interface ICountriesGridProps {
    countrySearch: string;
