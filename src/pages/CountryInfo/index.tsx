@@ -4,6 +4,7 @@ import { Link as RouterLink, useParams } from "react-router-dom";
 import { api } from "../../api/axios";
 import { ICountryInfo } from "../../components/CountriesGrid";
 import HomeIcon from '@mui/icons-material/Home';
+import { Loading } from "../../components/Loading";
 
 export function CountryInfo() {
    let { countryCode } = useParams();
@@ -19,11 +20,7 @@ export function CountryInfo() {
    }, [countryCode]);
 
    if (!countryInfo) {
-      return (
-         <Box height="100vh" display="flex" justifyContent="center" alignItems="center" >
-            <CircularProgress color="info" />
-         </Box >
-      );
+      return <Loading />
    }
 
    return (

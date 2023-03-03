@@ -8,6 +8,7 @@ import { api } from "../../api/axios";
 
 import FavoriteIcon from '@mui/icons-material/Favorite';
 import FavoriteBorderRoundedIcon from '@mui/icons-material/FavoriteBorderRounded';
+import { Loading } from "../Loading";
 
 export interface ICountryInfo {
    capital: string[];
@@ -48,8 +49,10 @@ interface ICountriesGridProps {
 }
 
 function CountriesGrid({ countrySearch }: ICountriesGridProps) {
-   const [countriesList, setCountriesList] = useState<ICountryInfo[]>([]);
    const [isLoading, setIsLoading] = useState(true);
+
+   const [countriesList, setCountriesList] = useState<ICountryInfo[]>([]);
+   const [countriesRendered, setCountriesRendered] = useState<ICountryInfo[]>([]);
 
    useEffect(() => {
       (async () => {
@@ -100,11 +103,7 @@ function CountriesGrid({ countrySearch }: ICountriesGridProps) {
    }
 
    if (isLoading) {
-      return (
-         <Box height="100vh" display="flex" justifyContent="center" alignItems="center" >
-            <CircularProgress color="info" />
-         </Box >
-      );
+      return <Loading />
    }
 
    if (!countriesList.length) {
