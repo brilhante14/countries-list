@@ -1,4 +1,4 @@
-import { Alert, Box, Card, CardMedia, IconButton, Link, Typography } from "@mui/material";
+import { Alert, Box, Card, CardActionArea, CardMedia, IconButton, Link, Typography } from "@mui/material";
 import CardContent from "@mui/material/CardContent";
 import Grid from "@mui/material/Grid";
 import { AxiosError } from "axios";
@@ -10,6 +10,7 @@ import FavoriteIcon from '@mui/icons-material/Favorite';
 import FavoriteBorderRoundedIcon from '@mui/icons-material/FavoriteBorderRounded';
 import { ICountryInfo } from "../../interfaces/country";
 import { Loading } from "../Loading";
+import Button from "@mui/material/Button/Button";
 
 interface ICountriesGridProps {
    countrySearch: string;
@@ -25,7 +26,6 @@ function CountriesGrid({ countrySearch, filteringFavorites }: ICountriesGridProp
    const favoritedCountries = countriesList.filter(c => filteringFavorites ? c.favorited : c);
 
    useEffect(() => {
-
       const fetchData = setTimeout(async () => {
          try {
             setIsLoading(true);
@@ -117,12 +117,15 @@ function CountriesGrid({ countrySearch, filteringFavorites }: ICountriesGridProp
                   ref={isLastElement ? lastCountryElementRef : null}
                >
                   <Card variant="elevation" >
-                     <CardMedia
-                        sx={{ height: 200 }}
-                        image={country.flags.svg}
-                        title={country.flags.alt}
-
-                     />
+                     <CardActionArea >
+                        <Link component={RouterLink} to={`/country/${country.cca3}`}>
+                           <CardMedia
+                              sx={{ height: 200 }}
+                              image={country.flags.svg}
+                              title={country.flags.alt}
+                           />
+                        </Link>
+                     </CardActionArea>
                      <CardContent>
                         <Box display="flex" justifyContent="space-between">
                            <Link
