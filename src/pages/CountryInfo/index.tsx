@@ -6,17 +6,17 @@ import { ICountryInfo } from "../../components/CountriesGrid";
 import HomeIcon from '@mui/icons-material/Home';
 
 export function CountryInfo() {
-   let { countryName } = useParams();
+   let { countryCode } = useParams();
 
    const [countryInfo, setCountryInfo] = useState<ICountryInfo>();
 
    useEffect(() => {
       (async () => {
-         const { data } = await api.get(`/name/${countryName}`);
+         const { data } = await api.get(`/alpha/${countryCode}`);
 
          setCountryInfo(data[0]);
       })()
-   }, [countryName]);
+   }, [countryCode]);
 
    if (!countryInfo) {
       return (
@@ -27,7 +27,7 @@ export function CountryInfo() {
    }
 
    return (
-      <Container sx={{ backgroundColor: "#A9A9B2", padding: "1rem", borderRadius: "8px" }}>
+      <Container sx={{ backgroundColor: "#f1f4c6", padding: "1rem", borderRadius: "8px" }}>
          <Breadcrumbs separator=">" aria-label="breadcrumb">
             <Link color="#FFF" to="/">
                <Typography fontWeight={500}>
@@ -37,8 +37,8 @@ export function CountryInfo() {
             </Link>
             <Typography>{countryInfo.name.official}</Typography>
          </Breadcrumbs>
-         <Box display="flex" gap={5} alignItems="center" mt={2}>
-            <Card sx={{ padding: "1rem", background: "#A9A9B2", borderRadius: 4 }}>
+         <Box display="flex" gap={5} justifyContent="center" alignItems="center" mt={2}>
+            <Card sx={{ padding: "1rem", background: "inherit", borderRadius: 4 }}>
                <CardHeader title={countryInfo.name.common} subheader={countryInfo.capital} sx={{}} />
                <CardMedia
                   sx={{ width: 280, height: 200 }}

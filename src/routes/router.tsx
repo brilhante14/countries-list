@@ -12,7 +12,7 @@ export const router = createBrowserRouter([
             path: "/",
             element: <Home />,
          }, {
-            path: "/country/:countryName",
+            path: "/country/:countryCode",
             element: <CountryInfo />,
          },
       ],
