@@ -1,6 +1,6 @@
-import { Box, Breadcrumbs, Container, Typography, CircularProgress, Paper, Card, CardHeader, CardMedia, Chip } from "@mui/material";
+import { Box, Breadcrumbs, Container, Typography, CircularProgress, Link, Card, CardHeader, CardMedia, Chip } from "@mui/material";
 import { useEffect, useState } from "react";
-import { Link, useParams } from "react-router-dom";
+import { Link as RouterLink, useParams } from "react-router-dom";
 import { api } from "../../api/axios";
 import { ICountryInfo } from "../../components/CountriesGrid";
 import HomeIcon from '@mui/icons-material/Home';
@@ -29,17 +29,15 @@ export function CountryInfo() {
    return (
       <Container sx={{ backgroundColor: "#f1f4c6", padding: "1rem", borderRadius: "8px" }}>
          <Breadcrumbs separator=">" aria-label="breadcrumb">
-            <Link color="#FFF" to="/">
-               <Typography fontWeight={500}>
-                  <HomeIcon sx={{ mr: 0.5, mb: -0.3 }} fontSize="inherit" />
-                  Home
-               </Typography>
+            <Link component={RouterLink} color="inherit" underline="hover" fontWeight={500} to="/">
+               <HomeIcon sx={{ mr: 0.5, mb: -0.3 }} fontSize="inherit" />
+               Home
             </Link>
             <Typography>{countryInfo.name.official}</Typography>
          </Breadcrumbs>
          <Box display="flex" gap={5} justifyContent="center" alignItems="center" mt={2}>
             <Card sx={{ padding: "1rem", background: "inherit", borderRadius: 4 }}>
-               <CardHeader title={countryInfo.name.common} subheader={countryInfo.capital} sx={{}} />
+               <CardHeader title={countryInfo.name.common} subheader={countryInfo.capital} />
                <CardMedia
                   sx={{ width: 280, height: 200 }}
                   image={countryInfo.flags.svg}

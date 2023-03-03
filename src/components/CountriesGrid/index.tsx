@@ -1,10 +1,10 @@
-import { Alert, Box, Card, CardMedia, CircularProgress, Typography } from "@mui/material";
-import CardActionArea from "@mui/material/CardActionArea";
+import FavoriteIcon from '@mui/icons-material/Favorite';
+import { Alert, Box, Card, CardMedia, CircularProgress, IconButton, Link, Typography } from "@mui/material";
 import CardContent from "@mui/material/CardContent";
 import Grid from "@mui/material/Grid";
 import { AxiosError } from "axios";
 import { memo, useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link as RouterLink } from "react-router-dom";
 import { api } from "../../api/axios";
 
 export interface ICountryInfo {
@@ -19,6 +19,7 @@ export interface ICountryInfo {
          };
       };
    };
+   cca3: string;
    currencies: {
       [abbr: string]: {
          name: string;
@@ -37,6 +38,7 @@ export interface ICountryInfo {
       svg: string;
       alt: string;
    };
+   favorited: boolean;
 }
 
 interface ICountriesGridProps {
@@ -44,8 +46,6 @@ interface ICountriesGridProps {
 }
 
 function CountriesGrid({ countrySearch }: ICountriesGridProps) {
-   const navigate = useNavigate();
-
    const [countriesList, setCountriesList] = useState<ICountryInfo[]>([]);
    const [isLoading, setIsLoading] = useState(true);
 
@@ -58,7 +58,14 @@ function CountriesGrid({ countrySearch }: ICountriesGridProps) {
 
             const { data } = await api.get(searchUrl);
 
-            setCountriesList(data);
+            const result = data.map((country: ICountryInfo) => {
+               return {
+                  ...country,
+                  favorited: false,
+               }
+            });
+
+            setCountriesList(result);
          } catch (error) {
             if (error instanceof AxiosError && error.response?.status === 404) {
                setCountriesList([]);
@@ -70,8 +77,8 @@ function CountriesGrid({ countrySearch }: ICountriesGridProps) {
 
    }, [countrySearch]);
 
-   async function handleCardClick(countryName: string) {
-      navigate(`/country/${countryName}`);
+   function handleClickFavorite() {
+
    }
 
    if (isLoading) {
@@ -98,24 +105,33 @@ function CountriesGrid({ countrySearch }: ICountriesGridProps) {
                item
                xs={3}
             >
-               <Card
-                  variant="elevation"
-               >
-                  <CardActionArea onClick={() => handleCardClick(country.name.official)}>
-                     <CardMedia
-                        sx={{ height: 200 }}
-                        image={country.flags.svg}
-                        title={country.flags.alt}
-                     />
-                     <CardContent>
-                        <Typography gutterBottom variant="h6">
+               <Card variant="elevation" >
+                  <CardMedia
+                     sx={{ height: 200 }}
+                     image={country.flags.svg}
+                     title={country.flags.alt}
+
+                  />
+                  <CardContent>
+                     <Box display="flex" justifyContent="space-between">
+                        <Link
+                           component={RouterLink}
+                           gutterBottom
+                           variant="h6"
+                           to={`/country/${country.cca3}`}
+                           underline="hover"
+                           color="inherit"
+                        >
                            {country.name.common}
                            <Typography variant="body2" color="text.secondary">
                               {country.capital ?? "-"}
                            </Typography>
-                        </Typography>
-                     </CardContent>
-                  </CardActionArea>
+                        </Link>
+                        <IconButton onClick={() => { console.log("Favorited") }}>
+                           <FavoriteIcon />
+                        </IconButton>
+                     </Box>
+                  </CardContent>
                </Card>
             </Grid>
          ))}
