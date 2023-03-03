@@ -1,4 +1,3 @@
-import FavoriteIcon from '@mui/icons-material/Favorite';
 import { Alert, Box, Card, CardMedia, CircularProgress, IconButton, Link, Typography } from "@mui/material";
 import CardContent from "@mui/material/CardContent";
 import Grid from "@mui/material/Grid";
@@ -6,6 +5,9 @@ import { AxiosError } from "axios";
 import { memo, useEffect, useState } from "react";
 import { Link as RouterLink } from "react-router-dom";
 import { api } from "../../api/axios";
+
+import FavoriteIcon from '@mui/icons-material/Favorite';
+import FavoriteBorderRoundedIcon from '@mui/icons-material/FavoriteBorderRounded';
 
 export interface ICountryInfo {
    capital: string[];
@@ -54,6 +56,9 @@ function CountriesGrid({ countrySearch }: ICountriesGridProps) {
          try {
             setIsLoading(true);
 
+            const storage = localStorage.getItem("favorite");
+            const favorited: string[] = storage ? JSON.parse(storage) : [];
+
             const searchUrl = countrySearch ? `/name/${countrySearch}` : "/all";
 
             const { data } = await api.get(searchUrl);
@@ -61,7 +66,7 @@ function CountriesGrid({ countrySearch }: ICountriesGridProps) {
             const result = data.map((country: ICountryInfo) => {
                return {
                   ...country,
-                  favorited: false,
+                  favorited: favorited.includes(country.cca3),
                }
             });
 
@@ -77,8 +82,21 @@ function CountriesGrid({ countrySearch }: ICountriesGridProps) {
 
    }, [countrySearch]);
 
-   function handleClickFavorite() {
+   function handleClickFavorite(countryCode: string, isFavorite: boolean) {
+      const storage = localStorage.getItem("favorite");
+      let favorited: string[] = storage ? JSON.parse(storage) : [];
 
+      if (isFavorite) {
+         favorited = favorited.filter(code => code !== countryCode);
+      } else {
+         favorited.push(countryCode);
+      }
+
+      localStorage.setItem("favorite", JSON.stringify(favorited));
+
+      setCountriesList(prevState => prevState.map(c => {
+         return c.cca3 === countryCode ? { ...c, favorited: !isFavorite } : c
+      }));
    }
 
    if (isLoading) {
@@ -127,8 +145,12 @@ function CountriesGrid({ countrySearch }: ICountriesGridProps) {
                               {country.capital ?? "-"}
                            </Typography>
                         </Link>
-                        <IconButton onClick={() => { console.log("Favorited") }}>
-                           <FavoriteIcon />
+                        <IconButton onClick={() => handleClickFavorite(country.cca3, country.favorited)}>
+                           {country.favorited ?
+                              <FavoriteIcon color="error" />
+                              :
+                              <FavoriteBorderRoundedIcon />
+                           }
                         </IconButton>
                      </Box>
                   </CardContent>
